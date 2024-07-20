@@ -19,12 +19,12 @@ if __name__ == '__main__':
     
     for filename in os.listdir(input_folder):
         if filename.endswith('.txt'):
-            print(filename)
-            print("!")
+            name=os.path.splitext(filename)[0]
+            
 
             poem = Poem_func(language, input_folder+filename, output_folder)
             patterns = seqIdent(poem)
-            file_name_only = os.path.basename(filename)
+            
             if os.path.exists(output_file):
                 with open(output_file, 'r') as file:
                     try:
@@ -33,11 +33,11 @@ if __name__ == '__main__':
                         existing_data = {}
             else:
                 existing_data = {}
-            if poem in existing_data:
-                existing_data[poem].extend(patterns)
-                print(existing_data[poem].extend(patterns))
+            if name in existing_data:
+                existing_data[name].extend(patterns)
+                
             else:
-                existing_data[poem] = patterns
+                existing_data[name] = patterns
             with open(output_file, 'w') as file:
                 file.write(json.dumps(existing_data, indent=4))
             print(f"Results have been saved to {output_file}")
