@@ -67,7 +67,7 @@ def extract_data(url, class_name=None, data_attr=None, output_file='output.txt')
     except IOError as e:
         print(f"Error writing to file: {e}")
 
-csv_file = 'output_lyricss.csv'
+csv_file = 'billboard_year_end_hot_100_singles_1993_2023.csv'
 output_dir = 'output_lyrics'  
 class_name = "Lyrics__Container-sc-1ynbvzw-1 kUgSbL"
 data_attr = "data-lyrics-container"
