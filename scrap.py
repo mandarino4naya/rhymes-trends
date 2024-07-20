@@ -3,6 +3,18 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
+from googlesearch import search
+
+def find_lyrics_link(query):
+   
+    search_results = search(query, num_results=10)
+    
+    for result in search_results:
+        if 'genius.com' in result or 'azlyrics.com' in result or 'lyrics.com' in result:
+            return result
+    
+    return "No relevant lyrics link found."
+
 
 def format_artist_title(artist, title):
     formatted_artist = artist.replace(' ', '-')
@@ -55,7 +67,7 @@ def extract_data(url, class_name=None, data_attr=None, output_file='output.txt')
     except IOError as e:
         print(f"Error writing to file: {e}")
 
-csv_file = 'billboard_year_end_hot_100_singles_1993_2023.csv'
+csv_file = 'output_lyricss.csv'
 output_dir = 'output_lyrics'  
 class_name = "Lyrics__Container-sc-1ynbvzw-1 kUgSbL"
 data_attr = "data-lyrics-container"
@@ -68,8 +80,9 @@ for index, row in df.iterrows():
     
     formatted_artist, formatted_title = format_artist_title(artist, title)
     name = re.sub(r'"', '', formatted_title)
+    query = f'{formatted_artist} {formatted_title} lyrics genius'
+    url = find_lyrics_link(query)
     
-    url = f"https://genius.com/{formatted_artist}-{name}-lyrics"
     
     output_file = os.path.join(output_dir, f"{name}.txt")
     
