@@ -6,19 +6,15 @@ import re
 from googlesearch import search
 
 def find_lyrics_link(query):
-   
     search_results = search(query, num_results=10)
-    
     for result in search_results:
         if 'genius.com' in result or 'azlyrics.com' in result or 'lyrics.com' in result:
             return result
-    
     return "No relevant lyrics link found."
 
-
 def format_artist_title(artist, title):
-    formatted_artist = artist.replace(' ', '-')
-    formatted_title = title.replace(' ', '-')
+    formatted_artist = artist.replace(' ', '-') if isinstance(artist, str) else 'Unknown-Artist'
+    formatted_title = title.replace(' ', '-') if isinstance(title, str) else 'Unknown-Title'
     return formatted_artist, formatted_title
 
 def sanitize_filename(filename):
@@ -72,18 +68,35 @@ output_dir = 'output_lyrics'
 class_name = "Lyrics__Container-sc-1ynbvzw-1 kUgSbL"
 data_attr = "data-lyrics-container"
 
+
+os.makedirs(output_dir, exist_ok=True)
+
 df = pd.read_csv(csv_file)
 
 for index, row in df.iterrows():
     artist = row['Artist(s)']
     title = row['Title']
+    Year=row['Year']
     
+    if pd.isna(title):
+        print(f"Skipping row {index} due to missing title.")
+        continue
+
     formatted_artist, formatted_title = format_artist_title(artist, title)
     name = re.sub(r'"', '', formatted_title)
-    query = f'{formatted_artist} {formatted_title} lyrics genius'
+    output_file = os.path.join(output_dir, f"{name+' - '+str(Year)}.txt")
+    
+    # Skip if file already exists
+    if os.path.exists(output_file):
+        print(f"Skipping {name} as the file already exists.")
+        continue
+    
+    
+    if pd.notna(artist):
+        query = f'{formatted_artist} {formatted_title} lyrics genius'
+    else:
+        query = f'{formatted_title} lyrics genius'
+
     url = find_lyrics_link(query)
-    
-    
-    output_file = os.path.join(output_dir, f"{name}.txt")
     
     extract_data(url, class_name=class_name, data_attr=data_attr, output_file=output_file)
